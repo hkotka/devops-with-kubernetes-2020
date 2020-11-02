@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pingpong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pingpong
+  template:
+    metadata:
+      labels:
+        app: pingpong
+    spec:
+      volumes:
+        - name: common-data
+          persistentVolumeClaim:
+            claimName: data-share
+      containers:
+        - name: pingpong
+          image: hkotka/ping-pong
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: common-data
+              mountPath: /common-data

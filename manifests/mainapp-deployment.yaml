@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hashgenerator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hashgenerator
+  template:
+    metadata:
+      labels:
+        app: hashgenerator
+    spec:
+      volumes:
+        - name: common-data
+          persistentVolumeClaim:
+            claimName: data-share
+      containers:
+        - name: hashgenerator-server
+          image: hkotka/main-app1
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: common-data
+              mountPath: /common-data
+        - name: timestamper
+          image: hkotka/main-app2
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: common-data
+              mountPath: /common-data

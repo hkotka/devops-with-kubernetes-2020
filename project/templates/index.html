@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.PageTitle}}</title>
+</head>
+<body>
+<div>
+    <img src="{{.ImageLoc}}">
+</div>
+<div>
+    <input type="text" id="todo-input" name="todo-input" required maxlength="140" size="50">
+    <input type="submit" value="Create TODO">
+</div>
+<div>
+    <ul>
+        {{range .Todos}}
+            <li>{{.Title}}</li>
+        {{end}}
+    </ul>
+</div>
+</body>
+</html>
