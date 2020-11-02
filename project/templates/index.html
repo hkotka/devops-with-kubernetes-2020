@@ -9,8 +9,10 @@
     <img src="{{.ImageLoc}}">
 </div>
 <div>
-    <input type="text" id="todo-input" name="todo-input" required maxlength="140" size="50">
-    <input type="submit" value="Create TODO">
+    <form action="/todo" method="post">
+        <input type="text" id="todo-input" name="todo-input" required maxlength="140" size="50">
+        <input type="submit" value="Create TODO">
+    </form>
 </div>
 <div>
     <ul>
