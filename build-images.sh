@@ -16,7 +16,8 @@ docker build -t ping-pong .
 docker tag ping-pong:latest hkotka/ping-pong
 docker push hkotka/ping-pong
 cd ..
-cd project || exit
-docker build -t project .
-docker tag project:latest hkotka/project
-docker push hkotka/project
+cd project/frontend || exit
+npm run build
+docker build -t project-frontend .
+docker tag project-frontend:latest hkotka/project-frontend
+docker push hkotka/project-frontend
