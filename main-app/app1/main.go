@@ -12,7 +12,7 @@ import (
 const (
 	httpServePort = "8080"
 	timestampFile = "/common-data/time.txt"
-	pongFile      = "/common-data/pong.txt"
+	pongUrl       = "http://pingpong-svc:2346/pongcount"
 )
 
 // Serves timestamp from a file and adds hash
@@ -29,7 +29,7 @@ func defaultHandler(w http.ResponseWriter, _ *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	pongCount, err := readFromFile(pongFile)
+	pongCount, err := getPongCount(pongUrl)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -37,6 +37,20 @@ func defaultHandler(w http.ResponseWriter, _ *http.Request) {
 	if _, err := fmt.Fprintf(w, resp); err != nil {
 		fmt.Println(err)
 	}
+}
+
+func getPongCount(url string) (string, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", nil
+	}
+
+	return string(data), nil
 }
 
 func rndString() string {
