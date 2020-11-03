@@ -3,13 +3,11 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"sync"
 )
 
 const (
 	httpServePort = "8080"
-	fileLocation  = "/common-data/pong.txt"
 )
 
 type pongCount struct {
@@ -21,8 +19,12 @@ var pong pongCount
 
 func main() {
 	fmt.Println("Server started in port", httpServePort)
-	http.HandleFunc("/", pingpong)
-	http.ListenAndServe(":"+httpServePort, nil)
+	http.HandleFunc("/pingpong", pingpong)
+	http.HandleFunc("/pongcount", getPongCount)
+
+	if err := http.ListenAndServe(":"+httpServePort, nil); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func pingpong(w http.ResponseWriter, _ *http.Request) {
@@ -31,21 +33,15 @@ func pingpong(w http.ResponseWriter, _ *http.Request) {
 	pong.count++
 	resp := fmt.Sprintf("Ping / Pongs: %d", pong.count)
 	fmt.Println(resp)
-	go func() {
-		err := writeToFile(resp)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}()
-	fmt.Fprintf(w, resp)
+
+	if _, err := fmt.Fprintf(w, resp); err != nil {
+		fmt.Println(err)
+	}
 }
 
-func writeToFile(pongCounter string) error {
-	f, err := os.Create(fileLocation)
-	if err != nil {
-		return err
+func getPongCount(w http.ResponseWriter, _ *http.Request) {
+	resp := fmt.Sprintf("%d", pong.count)
+	if _, err := fmt.Fprintf(w, resp); err != nil {
+		fmt.Println(err)
 	}
-	defer f.Close()
-	f.WriteString(pongCounter)
-	return nil
 }

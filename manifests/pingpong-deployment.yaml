@@ -12,14 +12,7 @@ spec:
       labels:
         app: pingpong
     spec:
-      volumes:
-        - name: common-data
-          persistentVolumeClaim:
-            claimName: data-share
       containers:
         - name: pingpong
           image: hkotka/ping-pong
           imagePullPolicy: Always
-          volumeMounts:
-            - name: common-data
-              mountPath: /common-data
