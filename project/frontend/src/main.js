@@ -1,6 +1,6 @@
 import App from './App.svelte';
 import TodoForm from './TodoForm.svelte';
-//import Pongcount from './Pongcount.svelte';
+import TodoList from './TodoList.svelte';
 
 const app = new App({
 	target: document.body,
@@ -12,9 +12,12 @@ const app = new App({
 const todo = new TodoForm({
 	target: document.body,
 	props: {
-		btnName: 'Create',
 		txtPlaceholder: 'New ToDo task'
 	}
+});
+
+const todolist = new TodoList({
+	target: document.body
 });
 
 //const pongcount = new Pongcount({

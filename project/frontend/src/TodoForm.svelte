@@ -1,6 +1,23 @@
 <script>
-	export let btnName;
 	export let txtPlaceholder;
+
+	let newTodo;
+	async function doPost() {
+		const res = await fetch("http://localhost:30000/todos", {
+			method: "POST",
+			body: JSON.stringify({
+				name: newTodo,
+				done: false,
+			}),
+		});
+		const json = await res.json();
+		resetTextInput();
+		getTodos;
+	}
+
+	function resetTextInput() {
+		document.getElementById("todo").value = "";
+	}
 </script>
 
 <style>
@@ -8,35 +25,31 @@
 		width: 50%;
 		font-weight: 50;
 	}
-	input[type="submit"] {
+	button {
 		color: black;
 		background-color: gold;
 		text-transform: uppercase;
 		font-weight: 50;
 	}
-	main {
-		text-align: center;
-	}
 	[id="add-todo"] {
 		align-content: center;
 	}
-	[id="todo-p"] {
+	div {
 		text-align: center;
 	}
 </style>
 
-<main>
-	<div id="add-todo">
-		<form action="/todos" method="post">
-			<input
-				type="text"
-				placeholder={txtPlaceholder}
-				id={btnName}
-				name={btnName}
-				required
-				minlength="2"
-				maxlength="140" />
-			<input type="submit" value={btnName} />
-		</form>
-	</div>
-</main>
+<div id="add-todo">
+	<form action="/todos" method="post" id="todo-form">
+		<input
+			type="text"
+			placeholder={txtPlaceholder}
+			id="todo"
+			name="todo"
+			required
+			minlength="2"
+			maxlength="140"
+			bind:value={newTodo} />
+		<button type="button" on:click={doPost}>Add ToDo</button>
+	</form>
+</div>

@@ -21,3 +21,8 @@ npm run build
 docker build -t project-frontend .
 docker tag project-frontend:latest hkotka/project-frontend
 docker push hkotka/project-frontend
+cd ..
+cd backend || exit
+docker build -t project-backend .
+docker tag project-backend:latest hkotka/project-backend
+docker push hkotka/project-backend

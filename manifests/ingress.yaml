@@ -28,7 +28,10 @@ spec:
     - http:
         paths:
           - path: /
-            pathType: Prefix
             backend:
-              serviceName: project-svc
+              serviceName: project-frontend-svc
               servicePort: 2347
+          - path: /todos
+            backend:
+              serviceName: project-backend-svc
+              servicePort: 2348
