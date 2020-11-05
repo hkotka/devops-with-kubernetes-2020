@@ -3,7 +3,7 @@
 
 	let newTodo;
 	async function doPost() {
-		const res = await fetch("http://localhost:30000/todos", {
+		const res = await fetch("https://localhost:30443/todos", {
 			method: "POST",
 			body: JSON.stringify({
 				name: newTodo,
