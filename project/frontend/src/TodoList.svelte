@@ -1,12 +1,15 @@
 <script>
+	let todoList = [];
+	console.log(window.location.origin + window.location.pathname);
+
 	const getTodos = (async () => {
-		const response = await fetch("http://localhost:30000/todos", {
+		const response = await fetch("/todos", {
 			method: "GET",
 			mode: "no-cors",
 		});
-		let todos = await response.json();
-		console.log(todos);
-		return todos;
+		todoList = await response.json();
+		console.log(todoList);
+		return todoList;
 	})();
 </script>
 
@@ -38,14 +41,18 @@
 {#await getTodos}
 	<p>Getting tasks...</p>
 {:then data}
-	{#each data.todos as todo}
-		<div>
-			<p>
-				{todo.name}
-				<span>{#if !todo.done}<input type="checkbox" />{/if}</span>
-			</p>
-		</div>
-	{/each}
+	{#if data.todos == null}
+		No Todo's
+	{:else}
+		{#each data.todos as todo}
+			<div>
+				<p>
+					{todo.name}
+					<span>{#if !todo.done}<input type="checkbox" />{/if}</span>
+				</p>
+			</div>
+		{/each}
+	{/if}
 {:catch error}
 	<p>An error ocurred: {error}</p>
 {/await}

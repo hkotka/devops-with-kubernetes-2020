@@ -1,9 +1,9 @@
 <script>
 	export let txtPlaceholder;
-
 	let newTodo;
+
 	async function doPost() {
-		const res = await fetch("http://localhost:30000/todos", {
+		const res = await fetch("/todos", {
 			method: "POST",
 			body: JSON.stringify({
 				name: newTodo,
@@ -12,6 +12,7 @@
 		});
 		const json = await res.json();
 		resetTextInput();
+		window.location.href = window.location.href;
 	}
 
 	function resetTextInput() {
@@ -39,7 +40,11 @@
 </style>
 
 <div id="add-todo">
-	<form action="/todos" method="post" id="todo-form">
+	<form
+		action="/todos"
+		method="post"
+		on:submit|preventDefault={doPost}
+		id="todo-form">
 		<input
 			type="text"
 			placeholder={txtPlaceholder}
@@ -49,6 +54,6 @@
 			minlength="2"
 			maxlength="140"
 			bind:value={newTodo} />
-		<button type="button" on:click={doPost}>Add ToDo</button>
+		<button type="submit">Add ToDo</button>
 	</form>
 </div>

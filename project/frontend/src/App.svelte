@@ -1,4 +1,7 @@
 <script>
+	import { onMount } from "svelte";
+	import TodoForm from "./TodoForm.svelte";
+	import TodoList from "./TodoList.svelte";
 	export let title;
 </script>
 
@@ -27,4 +30,6 @@
 
 <main>
 	<h1>{title}</h1>
+	<TodoForm txtPlaceholder="New ToDo task" />
+	<TodoList />
 </main>
