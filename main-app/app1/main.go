@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -14,6 +16,10 @@ const (
 	timestampFile = "/common-data/time.txt"
 	pongUrl       = "http://pingpong-svc:2346/pongcount"
 )
+
+type pong struct {
+	Count int `json:"count"`
+}
 
 // Serves timestamp from a file and adds hash
 func main() {
@@ -33,24 +39,29 @@ func defaultHandler(w http.ResponseWriter, _ *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	resp := timestamp + rndString() + "\n" + pongCount
+	resp := timestamp + rndString() + "\n" + strconv.Itoa(pongCount)
 	if _, err := fmt.Fprintf(w, resp); err != nil {
 		fmt.Println(err)
 	}
 }
 
-func getPongCount(url string) (string, error) {
+func getPongCount(url string) (int, error) {
+	var pongcount pong
+
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 	defer resp.Body.Close()
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", nil
+		return 0, nil
+	}
+	if err = json.Unmarshal(data, &pongcount); err != nil {
+		fmt.Println(err)
 	}
 
-	return string(data), nil
+	return pongcount.Count, nil
 }
 
 func rndString() string {

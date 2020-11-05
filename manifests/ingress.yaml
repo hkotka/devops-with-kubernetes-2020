@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: main-app-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /main
+            backend:
+              serviceName: hashresponce-svc
+              servicePort: 2345
+          - path: /pingpong
+            backend:
+              serviceName: pingpong-svc
+              servicePort: 2346
+          - path: /pongcount
+            backend:
+              serviceName: pingpong-svc
+              servicePort: 2346
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: project-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            backend:
+              serviceName: project-frontend-svc
+              servicePort: 2347
+          - path: /todos
+            backend:
+              serviceName: project-backend-svc
+              servicePort: 2348

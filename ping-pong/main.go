@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"sync"
@@ -11,11 +12,11 @@ const (
 )
 
 type pongCount struct {
-	count int
-	mux   sync.Mutex
+	Count int `json:"count"`
 }
 
 var pong pongCount
+var mutex sync.Mutex
 
 func main() {
 	fmt.Println("Server started in port", httpServePort)
@@ -28,10 +29,10 @@ func main() {
 }
 
 func pingpong(w http.ResponseWriter, _ *http.Request) {
-	pong.mux.Lock()
-	defer pong.mux.Unlock()
-	pong.count++
-	resp := fmt.Sprintf("Ping / Pongs: %d", pong.count)
+	mutex.Lock()
+	defer mutex.Unlock()
+	pong.Count++
+	resp := fmt.Sprintf("Ping / Pongs: %d", pong.Count)
 	fmt.Println(resp)
 
 	if _, err := fmt.Fprintf(w, resp); err != nil {
@@ -40,8 +41,14 @@ func pingpong(w http.ResponseWriter, _ *http.Request) {
 }
 
 func getPongCount(w http.ResponseWriter, _ *http.Request) {
-	resp := fmt.Sprintf("%d", pong.count)
-	if _, err := fmt.Fprintf(w, resp); err != nil {
+	resp, err := json.Marshal(pong)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	w.Header().Set("Content-type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if _, err := w.Write(resp); err != nil {
 		fmt.Println(err)
 	}
 }

@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-frontend-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: project-frontend
+  ports:
+    - port: 2347
+      targetPort: 80
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-backend-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: project-backend
+  ports:
+    - port: 2348
+      targetPort: 8080
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: project-frontend
+  template:
+    metadata:
+      labels:
+        app: project-frontend
+    spec:
+      containers:
+        - name: project-frontend
+          image: hkotka/project-frontend
+          imagePullPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project-backend
+  template:
+    metadata:
+      labels:
+        app: project-backend
+    spec:
+      containers:
+        - name: project-backend
+          image: hkotka/project-backend
+          imagePullPolicy: Always
