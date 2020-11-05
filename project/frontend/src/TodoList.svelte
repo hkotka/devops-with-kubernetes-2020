@@ -1,6 +1,6 @@
 <script>
 	const getTodos = (async () => {
-		const response = await fetch("https://localhost:30443/todos", {
+		const response = await fetch("http://localhost:30000/todos", {
 			method: "GET",
 			mode: "no-cors",
 		});
