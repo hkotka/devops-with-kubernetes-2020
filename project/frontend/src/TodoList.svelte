@@ -39,7 +39,7 @@
 </style>
 
 {#await getTodos}
-	<p>Getting tasks...</p>
+	Getting tasks...
 {:then data}
 	{#if data.todos == null}
 		No Todo's
