@@ -12,7 +12,6 @@
 		});
 		const json = await res.json();
 		resetTextInput();
-		getTodos;
 	}
 
 	function resetTextInput() {
