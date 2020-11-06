@@ -27,28 +27,33 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	r.GET("/todos", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"todos": todos,
-		})
-	})
-	r.POST("/todos", func(c *gin.Context) {
-		if c.Request.Body != nil {
-			data, _ := ioutil.ReadAll(c.Request.Body)
-			if err := addTodo(data); err != nil {
-				log.Println(err)
-			}
-			c.JSON(200, gin.H{
-				"message": "OK",
-			})
-		} else {
-			c.JSON(500, gin.H{
-				"message": "Empty HTTP request body",
-			})
-		}
-	})
+	r.GET("/todos", ginHandlerGetTodos)
+	r.POST("/todos", ginHandlerPostTodo)
+
 	if err := r.Run(); err != nil {
 		fmt.Println(err)
+	}
+}
+
+func ginHandlerGetTodos(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"todos": todos,
+	})
+}
+
+func ginHandlerPostTodo(c *gin.Context) {
+	if c.Request.Body != nil {
+		data, _ := ioutil.ReadAll(c.Request.Body)
+		if err := addTodo(data); err != nil {
+			log.Println(err)
+		}
+		c.JSON(200, gin.H{
+			"message": "OK",
+		})
+	} else {
+		c.JSON(500, gin.H{
+			"message": "Empty HTTP request body",
+		})
 	}
 }
 
