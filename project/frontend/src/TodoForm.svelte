@@ -1,9 +1,10 @@
 <script>
 	export let txtPlaceholder;
+	export let apiUrl;
 	let newTodo;
 
 	async function doPost() {
-		const res = await fetch("/todos", {
+		const res = await fetch(apiUrl, {
 			method: "POST",
 			body: JSON.stringify({
 				name: newTodo,
@@ -48,8 +49,9 @@
 		<input
 			type="text"
 			placeholder={txtPlaceholder}
+			autofocus="true"
 			id="todo"
-			name="todo"
+			name="todo-input"
 			required
 			minlength="2"
 			maxlength="140"

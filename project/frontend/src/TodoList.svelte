@@ -1,13 +1,16 @@
 <script>
+	export let apiUrl;
 	let todoList = [];
-	console.log(window.location.origin + window.location.pathname);
 
 	const getTodos = (async () => {
-		const response = await fetch("/todos", {
+		const response = await fetch(apiUrl, {
 			method: "GET",
-			mode: "no-cors",
 		});
-		todoList = await response.json();
+		if (response.ok) {
+			todoList = await response.json();
+		} else {
+			console.log("HTTP-Error: " + response.status);
+		}
 		console.log(todoList);
 		return todoList;
 	})();
@@ -40,11 +43,11 @@
 
 {#await getTodos}
 	Getting tasks...
-{:then data}
-	{#if data.todos == null}
+{:then todos}
+	{#if todos.todos == null}
 		No Todo's
 	{:else}
-		{#each data.todos as todo}
+		{#each todos.todos as todo}
 			<div>
 				<p>
 					{todo.name}

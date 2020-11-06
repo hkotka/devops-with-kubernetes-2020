@@ -1,8 +1,8 @@
 <script>
-	import { onMount } from "svelte";
 	import TodoForm from "./TodoForm.svelte";
 	import TodoList from "./TodoList.svelte";
 	export let title;
+	let apiUrl = "/todos";
 </script>
 
 <style>
@@ -17,8 +17,8 @@
 	h1 {
 		color: #000000;
 		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 50;
+		font-size: 3em;
+		font-weight: 100;
 	}
 
 	@media (min-width: 640px) {
@@ -30,6 +30,6 @@
 
 <main>
 	<h1>{title}</h1>
-	<TodoForm txtPlaceholder="New ToDo task" />
-	<TodoList />
+	<TodoForm txtPlaceholder="New ToDo task" {apiUrl} />
+	<TodoList {apiUrl} />
 </main>
