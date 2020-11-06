@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -31,6 +32,7 @@ func main() {
 }
 
 func defaultHandler(w http.ResponseWriter, _ *http.Request) {
+	msg := os.Getenv("MESSAGE")
 	timestamp, err := readFromFile(timestampFile)
 	if err != nil {
 		fmt.Println(err)
@@ -39,7 +41,7 @@ func defaultHandler(w http.ResponseWriter, _ *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	resp := timestamp + rndString() + "\n" + strconv.Itoa(pongCount)
+	resp := msg + "\n" + timestamp + rndString() + "\n" + strconv.Itoa(pongCount)
 	if _, err := fmt.Fprintf(w, resp); err != nil {
 		fmt.Println(err)
 	}

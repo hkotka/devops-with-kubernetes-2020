@@ -35,7 +35,7 @@ spec:
       volumes:
         - name: common-data
           persistentVolumeClaim:
-            claimName: data-share
+            claimName: common-data
       containers:
         - name: hashgenerator-server
           image: hkotka/main-app1
@@ -43,6 +43,12 @@ spec:
           volumeMounts:
             - name: common-data
               mountPath: /common-data
+          env:
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: main-app-configmap
+                  key: MESSAGE
         - name: timestamper
           image: hkotka/main-app2
           imagePullPolicy: Always
