@@ -70,3 +70,17 @@ spec:
         - name: project-backend
           image: hkotka/project-backend
           imagePullPolicy: Always
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-root-pw
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_URL
+              value: "postgres-project-svc"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: "postgres-admin"
+            - name: POSTGRES_DB
+              value: "project"
