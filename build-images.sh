@@ -1,4 +1,3 @@
-#!/bin/zsh
 cd main-app/app1 || exit
 docker build -t main-app1 .
 docker tag main-app1:latest hkotka/main-app1
