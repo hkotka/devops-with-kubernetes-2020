@@ -66,13 +66,23 @@ func main() {
 func ginHandlerPongIncrement(c *gin.Context) {
 	pong.db.First(&pong)
 	pong.Count++
-	c.String(200, "%d", pong.Count)
-	pong.db.Save(&pong)
+	if err := pong.db.Save(&pong).Error; err != nil {
+		c.JSON(500, gin.H{
+			"error": err,
+		})
+	} else {
+		c.String(200, "%d", pong.Count)
+	}
 }
 
 func ginHandlerGetPongs(c *gin.Context) {
-	pong.db.First(&pong)
-	c.JSON(200, gin.H{
-		"pongs": pong.Count,
-	})
+	if err := pong.db.First(&pong).Error; err != nil {
+		c.JSON(500, gin.H{
+			"error": err,
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"pongs": pong.Count,
+		})
+	}
 }
