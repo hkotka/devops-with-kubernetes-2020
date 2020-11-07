@@ -19,7 +19,7 @@ const (
 )
 
 type pong struct {
-	Count int `json:"count"`
+	Count int `json:"pongs"`
 }
 
 // Serves timestamp from a file and adds hash

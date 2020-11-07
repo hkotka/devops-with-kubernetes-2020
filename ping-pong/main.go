@@ -1,54 +1,78 @@
 package main
 
 import (
-	"encoding/json"
+	"errors"
 	"fmt"
-	"net/http"
-	"sync"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"log"
+	"os"
+	"time"
 )
 
-const (
-	httpServePort = "8080"
-)
-
-type pongCount struct {
-	Count int `json:"count"`
+type PongCount struct {
+	gorm.Model
+	db    *gorm.DB
+	Count int `json:"count" gorm:"default:0"`
 }
 
-var pong pongCount
-var mutex sync.Mutex
+func (p *PongCount) NewPong() {
+	var err error
+	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable TimeZone=Europe/Helsinki",
+		os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB"),
+		os.Getenv("POSTGRES_URL"), os.Getenv("POSTGRES_PORT"))
+
+	p.Count = 0
+	p.db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+	if err := p.db.AutoMigrate(&p); err != nil {
+		log.Fatal(err)
+	}
+	err = p.db.First(&pong).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		pong.db.Save(&p)
+	}
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		fmt.Println(err)
+	}
+}
+
+var pong PongCount
 
 func main() {
-	fmt.Println("Server started in port", httpServePort)
-	http.HandleFunc("/pingpong", pingpong)
-	http.HandleFunc("/pongcount", getPongCount)
+	pong.NewPong()
 
-	if err := http.ListenAndServe(":"+httpServePort, nil); err != nil {
-		fmt.Println(err)
+	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:30000", "https://localhost:30443"},
+		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"*"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	r.GET("/pongcount", ginHandlerGetPongs)
+	r.GET("/pingpong", ginHandlerPongIncrement)
+
+	if err := r.Run(); err != nil {
+		log.Fatal(err)
 	}
 }
 
-func pingpong(w http.ResponseWriter, _ *http.Request) {
-	mutex.Lock()
-	defer mutex.Unlock()
+func ginHandlerPongIncrement(c *gin.Context) {
+	pong.db.First(&pong)
 	pong.Count++
-	resp := fmt.Sprintf("Ping / Pongs: %d", pong.Count)
-	fmt.Println(resp)
-
-	if _, err := fmt.Fprintf(w, resp); err != nil {
-		fmt.Println(err)
-	}
+	c.String(200, "%d", pong.Count)
+	pong.db.Save(&pong)
 }
 
-func getPongCount(w http.ResponseWriter, _ *http.Request) {
-	resp, err := json.Marshal(pong)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	w.Header().Set("Content-type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	if _, err := w.Write(resp); err != nil {
-		fmt.Println(err)
-	}
+func ginHandlerGetPongs(c *gin.Context) {
+	pong.db.First(&pong)
+	c.JSON(200, gin.H{
+		"pongs": pong.Count,
+	})
 }
