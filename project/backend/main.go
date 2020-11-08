@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
+	ginLog "github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -12,7 +15,10 @@ import (
 	"log"
 	"os"
 	"time"
+	"unicode/utf8"
 )
+
+const todoLeghtLimit = 140
 
 type Todos struct {
 	todos []Todo
@@ -49,7 +55,27 @@ var todoList Todos
 
 func main() {
 	todoList.Init()
-	r := gin.Default()
+
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	ginLog.Logger = ginLog.Output(
+		zerolog.ConsoleWriter{
+			Out:     os.Stdout,
+			NoColor: false,
+		},
+	)
+
+	r := gin.New()
+	r.Use(logger.SetLogger())
+
+	// Custom logger
+	subLog := zerolog.New(os.Stdout).With().
+		Logger()
+
+	r.Use(logger.SetLogger(logger.Config{
+		Logger: &subLog,
+		UTC:    true,
+	}))
+
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:30000", "http://localhost:5000", "https://localhost:30443"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
@@ -100,9 +126,12 @@ func ginHandlerPostTodo(c *gin.Context) {
 			"message": "Error, invalid json package",
 		})
 		return
-	} else if len(newTodo.Name) > 140 {
+	}
+	if utf8.RuneCountInString(newTodo.Name) > todoLeghtLimit {
+		msg := fmt.Sprintf("Rejected NewTodo: NewTodo had %d runes: Limit is %d", utf8.RuneCountInString(newTodo.Name), todoLeghtLimit)
+		log.Println(msg)
 		c.JSON(500, gin.H{
-			"message": "Too many characters. ToDo's can be up to 140 characters",
+			"message": msg,
 		})
 		return
 	} else {
