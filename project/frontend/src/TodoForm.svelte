@@ -1,19 +1,19 @@
 <script>
+	import { createEventDispatcher } from "svelte";
+	const dispatch = createEventDispatcher();
 	export let txtPlaceholder;
 	export let apiUrl;
 	let newTodo;
 
-	async function doPost() {
-		const res = await fetch(apiUrl, {
+	function doPost() {
+		fetch(apiUrl, {
 			method: "POST",
 			body: JSON.stringify({
 				name: newTodo,
 				done: false,
 			}),
 		});
-		const json = await res.json();
 		resetTextInput();
-		window.location.href = window.location.href;
 	}
 
 	function resetTextInput() {
@@ -40,9 +40,11 @@
 	}
 </style>
 
+<!-- svelte-ignore a11y-autofocus -->
 <div id="add-todo">
 	<form
 		action="/todos"
+		on:submit={() => dispatch('notify')}
 		method="post"
 		on:submit|preventDefault={doPost}
 		id="todo-form">
@@ -56,6 +58,6 @@
 			minlength="2"
 			maxlength="140"
 			bind:value={newTodo} />
-		<button type="submit">Add ToDo</button>
+		<button type="submit" on:click={() => dispatch('notify')}>Add ToDo</button>
 	</form>
 </div>
