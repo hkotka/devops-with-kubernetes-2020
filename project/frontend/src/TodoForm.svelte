@@ -1,6 +1,5 @@
 <script>
-	import { createEventDispatcher } from "svelte";
-	const dispatch = createEventDispatcher();
+	import { todoList } from "./store.js";
 	export let txtPlaceholder;
 	export let apiUrl;
 	let newTodo;
@@ -13,11 +12,25 @@
 				done: false,
 			}),
 		});
+		updateTodoList();
 		resetTextInput();
 	}
 
 	function resetTextInput() {
 		document.getElementById("todo").value = "";
+	}
+
+	async function updateTodoList() {
+		let newlist;
+		const response = await fetch(apiUrl, {
+			method: "GET",
+		});
+		if (response.ok) {
+			newlist = await response.json();
+		} else {
+			console.log("HTTP-Error: " + response.status);
+		}
+		todoList.set(newlist);
 	}
 </script>
 
@@ -44,7 +57,6 @@
 <div id="add-todo">
 	<form
 		action="/todos"
-		on:submit={() => dispatch('notify')}
 		method="post"
 		on:submit|preventDefault={doPost}
 		id="todo-form">
@@ -58,6 +70,6 @@
 			minlength="2"
 			maxlength="140"
 			bind:value={newTodo} />
-		<button type="submit" on:click={() => dispatch('notify')}>Add ToDo</button>
+		<button type="submit" on:click={doPost}>Add ToDo</button>
 	</form>
 </div>

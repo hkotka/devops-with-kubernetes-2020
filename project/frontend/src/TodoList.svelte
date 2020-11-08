@@ -1,7 +1,6 @@
 <script>
 	import { todoList } from "./store.js";
 	$: todos = $todoList;
-	console.log($todoList);
 </script>
 
 <style>
