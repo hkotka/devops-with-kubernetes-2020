@@ -4,7 +4,7 @@
 	import TodoForm from "./TodoForm.svelte";
 	import TodoList from "./TodoList.svelte";
 	export let title;
-	let apiUrl = "http://localhost:8080/todos";
+	let apiUrl = "/todos";
 
 	onMount(async () => {
 		let todos;
