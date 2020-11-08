@@ -25,3 +25,8 @@ cd backend || exit
 docker build -t project-backend .
 docker tag project-backend:latest hkotka/project-backend
 docker push hkotka/project-backend
+cd ..
+cd daily-url-cron || exit
+docker build -t daily-url-cron .
+docker tag daily-url-cron:latest hkotka/daily-url-cron
+docker push hkotka/daily-url-cron
