@@ -57,7 +57,7 @@ metadata:
   name: project-backend
   namespace: project
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: project-backend
@@ -84,3 +84,33 @@ spec:
               value: "postgres-admin"
             - name: POSTGRES_DB
               value: "project"
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: daily-wiki-todo-cronjob
+  namespace: project
+spec:
+  schedule: "0 7 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: backup
+              image: hkotka/daily-url-cron
+              env:
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-root-pw
+                      key: POSTGRES_PASSWORD
+                - name: POSTGRES_URL
+                  value: "postgres-project-svc"
+                - name: POSTGRES_PORT
+                  value: "5432"
+                - name: POSTGRES_USER
+                  value: "postgres-admin"
+                - name: POSTGRES_DB
+                  value: "project"
+          restartPolicy: OnFailure
