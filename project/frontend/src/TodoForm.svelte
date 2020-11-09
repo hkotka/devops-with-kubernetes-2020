@@ -1,23 +1,41 @@
 <script>
+	import { todoList } from "./store.js";
 	export let txtPlaceholder;
 	export let apiUrl;
 	let newTodo;
 
 	async function doPost() {
-		const res = await fetch(apiUrl, {
+		const response = await fetch(apiUrl, {
 			method: "POST",
 			body: JSON.stringify({
 				name: newTodo,
 				done: false,
 			}),
 		});
-		const json = await res.json();
-		resetTextInput();
-		window.location.href = window.location.href;
+		if (response.ok) {
+			resetTextInput();
+			updateTodoList();
+		} else {
+			console.log("HTTP-Error: " + response.status);
+		}
 	}
 
 	function resetTextInput() {
 		document.getElementById("todo").value = "";
+	}
+
+	async function updateTodoList() {
+		let newlist;
+		const response = await fetch(apiUrl, {
+			method: "GET",
+		});
+		if (response.ok) {
+			newlist = await response.json();
+			todoList.set(newlist);
+			console.log(newlist);
+		} else {
+			console.log("HTTP-Error: " + response.status);
+		}
 	}
 </script>
 
@@ -40,6 +58,7 @@
 	}
 </style>
 
+<!-- svelte-ignore a11y-autofocus -->
 <div id="add-todo">
 	<form
 		action="/todos"
