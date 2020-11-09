@@ -23,7 +23,7 @@ metadata:
   name: hashgenerator
   namespace: main-app
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: hashgenerator
