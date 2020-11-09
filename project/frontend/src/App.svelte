@@ -12,6 +12,7 @@
 		if (res.ok) {
 			todos = await res.json();
 			todoList.set(todos);
+			console.log(todos);
 		} else {
 			console.log("HTTP-Error: " + res.status);
 		}

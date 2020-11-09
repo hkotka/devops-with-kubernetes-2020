@@ -7,8 +7,4 @@ const app = new App({
 	}
 });
 
-//const pongcount = new Pongcount({
-//	target: document.body
-//})
-
 export default app;

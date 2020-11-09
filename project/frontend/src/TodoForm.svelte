@@ -4,16 +4,20 @@
 	export let apiUrl;
 	let newTodo;
 
-	function doPost() {
-		fetch(apiUrl, {
+	async function doPost() {
+		const response = await fetch(apiUrl, {
 			method: "POST",
 			body: JSON.stringify({
 				name: newTodo,
 				done: false,
 			}),
 		});
-		updateTodoList();
-		resetTextInput();
+		if (response.ok) {
+			resetTextInput();
+			updateTodoList();
+		} else {
+			console.log("HTTP-Error: " + response.status);
+		}
 	}
 
 	function resetTextInput() {
@@ -27,10 +31,11 @@
 		});
 		if (response.ok) {
 			newlist = await response.json();
+			todoList.set(newlist);
+			console.log(newlist);
 		} else {
 			console.log("HTTP-Error: " + response.status);
 		}
-		todoList.set(newlist);
 	}
 </script>
 
@@ -70,6 +75,6 @@
 			minlength="2"
 			maxlength="140"
 			bind:value={newTodo} />
-		<button type="submit" on:click={doPost}>Add ToDo</button>
+		<button type="submit">Add ToDo</button>
 	</form>
 </div>
