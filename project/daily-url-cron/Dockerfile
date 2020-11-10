@@ -6,6 +6,6 @@ RUN go get -u "gorm.io/gorm" && go get -u "gorm.io/driver/postgres"
 COPY . /go/src
 RUN go build -o /go/app
 
-FROM golang:1.15.3
+FROM gcr.io/distroless/base-debian10
 COPY --from=build /go/app /
 CMD ["/app"]
