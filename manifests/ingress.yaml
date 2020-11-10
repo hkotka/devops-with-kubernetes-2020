@@ -38,6 +38,6 @@ spec:
               serviceName: project-backend-svc
               servicePort: 2348
           - path: /images
-              backend:
-                serviceName: project-backend-svc
-                servicePort: 2348
+            backend:
+              serviceName: project-backend-svc
+              servicePort: 2348

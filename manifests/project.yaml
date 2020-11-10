@@ -66,6 +66,10 @@ spec:
       labels:
         app: project-backend
     spec:
+      volumes:
+        - name: picsum
+          persistentVolumeClaim:
+            claimName: picsum
       containers:
         - name: project-backend
           image: hkotka/project-backend
@@ -84,6 +88,9 @@ spec:
               value: "postgres-admin"
             - name: POSTGRES_DB
               value: "project"
+          volumeMounts:
+            - name: picsum
+              mountPath: /images
 ---
 apiVersion: batch/v1beta1
 kind: CronJob
