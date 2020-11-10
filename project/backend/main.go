@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/logger"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	ginLog "github.com/rs/zerolog/log"
@@ -13,12 +14,19 @@ import (
 	"gorm.io/gorm"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"time"
 	"unicode/utf8"
 )
 
-const todoLeghtLimit = 140
+const (
+	todoLeghtLimit  = 140
+	picsumUrl       = "https://picsum.photos/200"
+	picDestLocation = "images/picsum.jpg"
+)
+
+var todoList Todos
 
 type Todos struct {
 	todos []Todo
@@ -51,10 +59,16 @@ func (t *Todos) Init() {
 	}
 }
 
-var todoList Todos
-
 func main() {
 	todoList.Init()
+
+	go func() {
+		if !checkFileExists(picDestLocation) {
+			if err := getNewPicsum(picsumUrl); err != nil {
+				log.Println(err)
+			}
+		}
+	}()
 
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	ginLog.Logger = ginLog.Output(
@@ -84,6 +98,7 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
+	r.Use(static.Serve("/images", static.LocalFile("/images", false)))
 	r.GET("/todos", ginHandlerGetTodos)
 	r.POST("/todos", ginHandlerPostTodo)
 
@@ -143,4 +158,36 @@ func ginHandlerPostTodo(c *gin.Context) {
 			})
 		}
 	}
+}
+
+func getNewPicsum(url string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(picDestLocation)
+	if err != nil {
+		return err
+	}
+	if _, err = f.Write(data); err != nil {
+		fmt.Println(err)
+	}
+	log.Printf("Fetched new Picsum image to %s\n", picDestLocation)
+
+	return nil
+}
+
+func checkFileExists(file string) bool {
+	_, err := os.Stat(file)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
 }
