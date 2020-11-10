@@ -3,6 +3,7 @@
 	import { todoList } from "./store.js";
 	import TodoForm from "./TodoForm.svelte";
 	import TodoList from "./TodoList.svelte";
+	import Picsum from "./Picsum.svelte";
 	export let title;
 	let apiUrl = "/todos";
 
@@ -46,4 +47,5 @@
 	<h1>{title}</h1>
 	<TodoForm txtPlaceholder="New ToDo task" {apiUrl} />
 	<TodoList />
+	<Picsum/>
 </main>

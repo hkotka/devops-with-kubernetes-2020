@@ -1,0 +1,1 @@
+<img src="images/picsum.jpg" alt="Random Picsum">
