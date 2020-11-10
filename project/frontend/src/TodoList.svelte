@@ -1,5 +1,6 @@
 <script>
 	import { todoList } from "./store.js";
+	import { fade } from 'svelte/transition';
 	$: todos = $todoList;
 </script>
 
@@ -9,13 +10,13 @@
 		align-items: center;
 		margin-left: auto;
 		margin-right: auto;
+		width: 40%;
 	}
 	p {
 		border: 1px black;
 		border-style: groove;
 		border-radius: 5px;
 		padding: 10px;
-		width: 200pt;
 		fill: azure;
 		font-weight: 50;
 		text-align: left;
@@ -30,7 +31,7 @@
 
 {#if todos.todos}
 	{#each todos.todos as todo}
-		<div>
+		<div transition:fade>
 			<p>
 				{todo.name}
 				<span>{#if !todo.done}<input type="checkbox" />{/if}</span>
