@@ -55,6 +55,7 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
+	r.GET("/", ginHandlerGKEHealthcheck)
 	r.GET("/pongcount", ginHandlerGetPongs)
 	r.GET("/pingpong", ginHandlerPongIncrement)
 
@@ -85,4 +86,10 @@ func ginHandlerGetPongs(c *gin.Context) {
 			"pongs": pong.Count,
 		})
 	}
+}
+
+func ginHandlerGKEHealthcheck(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"health": "ok",
+	})
 }
