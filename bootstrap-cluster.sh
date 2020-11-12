@@ -8,10 +8,10 @@ kubectl apply -f manifests/local/volumes/
 kubectl apply -f manifests/local/configs/
 # Install sealed secrets and apply secrets
 kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.13.1/controller.yaml
-rm manifests/secrets/*
+rm manifests/local/secrets/*
 sleep 30
-kubeseal --scope cluster-wide -o yaml <mysecret-project.json >manifests/secrets/postgres-project-secrets.yaml
-kubeseal --scope cluster-wide -o yaml <mysecret-mainapp.json >manifests/secrets/postgres-mainapp-secrets.yaml
+kubeseal --scope cluster-wide -o yaml <mysecret-project.json >manifests/local/secrets/postgres-project-secrets.yaml
+kubeseal --scope cluster-wide -o yaml <mysecret-mainapp.json >manifests/local/secrets/postgres-mainapp-secrets.yaml
 kubectl apply -f manifests/local/secrets/
 # Start apps
 kubectl apply -f manifests/local/apps
