@@ -1,0 +1,23 @@
+apiVersion: skaffold/v2beta9
+kind: Config
+metadata:
+  name: devops-with-kubernetes
+build:
+  local:
+    push: true
+  artifacts:
+  - image: hkotka/project-backend
+    context: project/backend
+  - image: hkotka/project-frontend
+    context: project/frontend
+  - image: hkotka/main-app1
+    context: main-app/app1
+  - image: hkotka/main-app2
+    context: main-app/app2
+  - image: hkotka/ping-pong
+    context: ping-pong
+deploy:
+  kubectl:
+    manifests:
+    - manifests/local/apps/project.yaml
+    - manifests/local/apps/mainapp.yaml
