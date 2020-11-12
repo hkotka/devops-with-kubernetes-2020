@@ -98,6 +98,7 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
+	r.GET("/", ginHandlerGKEHealthcheck)
 	r.Use(static.Serve("/images", static.LocalFile("/images", false)))
 	r.GET("/todos", ginHandlerGetTodos)
 	r.POST("/todos", ginHandlerPostTodo)
@@ -105,6 +106,12 @@ func main() {
 	if err := r.Run(); err != nil {
 		fmt.Println(err)
 	}
+}
+
+func ginHandlerGKEHealthcheck(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"health": "ok",
+	})
 }
 
 func ginHandlerGetTodos(c *gin.Context) {
