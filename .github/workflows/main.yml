@@ -1,0 +1,45 @@
+name: Build and release main-app and project
+
+on:
+  push:
+
+env:
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-a
+
+jobs:
+  build-and-publish-images:
+    name: project - Build and Publish
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        build-dir: ["project/backend", "project/frontend", "project/cronjob"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+      - run: gcloud --quiet auth configure-docker
+      - run: gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+
+      - name: Create image name ENV
+        run: echo "IMAGE_NAME=gcr.io/${{ secrets.GKE_PROJECT }}/${{ matrix.build-dir }}:$GITHUB_RUN_ID" >> $GITHUB_ENV
+      - name: Build and publish images
+        run: |
+          cd ${{ matrix.build-dir }}
+          docker build --tag "$IMAGE_NAME" .
+          docker push "$IMAGE_NAME"
+
+      - name: Set up Kustomize
+        run: |-
+          curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+          chmod u+x ./kustomize
+      - name: Kustomize ${{ matrix.build-dir }}
+        run: cd manifests/gke/${{ matrix.build-dir }} && kustomize edit set image ${{ matrix.build-dir }}="$IMAGE_NAME"
+      - name: Deploy ${{ matrix.build-dir }}
+        run: cd manifests/gke/${{ matrix.build-dir }} && kubectl apply -k .

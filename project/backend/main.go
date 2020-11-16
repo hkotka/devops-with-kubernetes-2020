@@ -3,6 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
+	"time"
+	"unicode/utf8"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/logger"
 	"github.com/gin-contrib/static"
@@ -12,12 +19,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"os"
-	"time"
-	"unicode/utf8"
 )
 
 const (
@@ -91,7 +92,7 @@ func main() {
 	}))
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:30000", "http://localhost:5000", "https://localhost:30443"},
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"*"},
 		AllowCredentials: true,

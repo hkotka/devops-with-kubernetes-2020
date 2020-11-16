@@ -1,2 +1,4 @@
 .idea/*
 mysecret-mainapp.json
+mysecret-project.json
+*-secrets.yaml
