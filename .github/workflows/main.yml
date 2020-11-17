@@ -1,7 +1,10 @@
-name: Build and release main-app and project
+name: Build and release and project
 
 on:
   push:
+    paths:
+      - project/**
+      - manifests/gke/project/**
 
 env:
   GKE_CLUSTER: dwk-cluster
