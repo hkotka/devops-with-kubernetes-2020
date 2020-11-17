@@ -26,4 +26,11 @@ spec:
                   value: "postgres-admin"
                 - name: POSTGRES_DB
                   value: "project"
+              resources:
+                requests:
+                  memory: "32Mi"
+                  cpu: "200m"
+                limits:
+                  memory: "50Mi"
+                  cpu: "400m"
           restartPolicy: OnFailure
