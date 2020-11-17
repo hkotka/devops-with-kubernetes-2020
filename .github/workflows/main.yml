@@ -8,8 +8,45 @@ env:
   GKE_ZONE: europe-north1-a
 
 jobs:
+  bootstrap-environment:
+    name: project - bootstrap GKE environment for this branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+      - run: gcloud --quiet auth configure-docker
+      - run: gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+
+      - name: Set up Kustomize
+        run: |-
+          curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+          chmod u+x ./kustomize
+
+      - name: Kustomize namespace to reflect this branch
+        run: cd manifests/gke/project && kustomize edit set namespace ${GITHUB_REF#refs/heads/}
+
+      - name: Bootsrap project environment (volumes, postgres, ingress)
+        run: |-
+          kubectl create namespace ${GITHUB_REF#refs/heads/} || true
+          kubectl config set-context --current --namespace=${GITHUB_REF#refs/heads/}
+          cd manifests/gke/project
+          kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.13.1/controller.yaml
+          kubectl rollout status deployment sealed-secrets-controller -n kube-system
+          wget https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.13.1/kubeseal-linux-amd64 -O kubeseal
+          sudo install -m 755 kubeseal /usr/local/bin/kubeseal
+          echo ${{ secrets.POSTGRESPW }} >> mysecret-project.json
+          kubeseal --scope cluster-wide -o yaml <mysecret-project.json >postgres-project-secrets.yaml
+          kubectl apply -k .
+
   build-and-publish-images:
     name: project - Build and Publish
+    needs: ["bootstrap-environment"]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -39,7 +76,13 @@ jobs:
         run: |-
           curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
           chmod u+x ./kustomize
-      - name: Kustomize ${{ matrix.build-dir }}
+      - name: Kustomize ${{ matrix.build-dir }} image to reflect current build
         run: cd manifests/gke/${{ matrix.build-dir }} && kustomize edit set image ${{ matrix.build-dir }}="$IMAGE_NAME"
+      - name: Create namespace for branch
+        run: |-
+          kubectl create namespace ${GITHUB_REF#refs/heads/} || true
+          kubectl config set-context --current --namespace=${GITHUB_REF#refs/heads/}
+          cd manifests/gke/${{ matrix.build-dir }} && kustomize edit set namespace ${GITHUB_REF#refs/heads/}
+
       - name: Deploy ${{ matrix.build-dir }}
         run: cd manifests/gke/${{ matrix.build-dir }} && kubectl apply -k .

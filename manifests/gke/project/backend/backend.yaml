@@ -12,18 +12,6 @@ spec:
       targetPort: 8080
       protocol: TCP
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: picsum
-  namespace: project
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 100Mi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -41,8 +29,7 @@ spec:
     spec:
       volumes:
         - name: picsum
-          persistentVolumeClaim:
-            claimName: picsum
+          emptyDir: {}
       containers:
         - name: project-backend
           image: project/backend
