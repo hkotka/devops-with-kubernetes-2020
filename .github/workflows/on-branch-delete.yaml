@@ -1,4 +1,4 @@
-name: Delete GKE namespace ${{ github.event.ref }}
+name: Delete GKE namespace for deleted branch
 
 on:
   delete:
@@ -9,7 +9,7 @@ env:
 
 jobs:
   delete-namespace:
-    name: delete ${{ github.event.ref }} namespace and resources
+    name: delete namespace and resources
     runs-on: ubuntu-latest
 
     steps:
