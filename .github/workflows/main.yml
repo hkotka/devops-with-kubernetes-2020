@@ -80,7 +80,6 @@ jobs:
         run: cd manifests/gke/${{ matrix.build-dir }} && kustomize edit set image ${{ matrix.build-dir }}="$IMAGE_NAME"
       - name: Create namespace for branch
         run: |-
-          kubectl create namespace ${GITHUB_REF#refs/heads/} || true
           kubectl config set-context --current --namespace=${GITHUB_REF#refs/heads/}
           cd manifests/gke/${{ matrix.build-dir }} && kustomize edit set namespace ${GITHUB_REF#refs/heads/}
 
