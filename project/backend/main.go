@@ -60,6 +60,10 @@ func (t *Todos) Init() {
 	}
 }
 
+func (t *Todo) String() string {
+	return fmt.Sprintf("Added new todo wit ID: %d and task: %s", t.ID, t.Name)
+}
+
 func main() {
 	todoList.Init()
 
@@ -164,6 +168,7 @@ func ginHandlerPostTodo(c *gin.Context) {
 			c.JSON(200, gin.H{
 				"message": "OK",
 			})
+			log.Println(&newTodo)
 		}
 	}
 }
