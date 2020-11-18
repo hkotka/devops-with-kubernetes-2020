@@ -3,3 +3,4 @@ mysecret-mainapp.json
 mysecret-main-app.json
 mysecret-project.json
 *-secrets.yaml
+*.db
