@@ -5,6 +5,7 @@ on:
     paths:
       - project/**
       - manifests/gke/project/**
+      - .github/workflows/**
 
 env:
   GKE_CLUSTER: dwk-cluster

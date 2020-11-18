@@ -9,6 +9,7 @@ env:
 
 jobs:
   delete-namespace:
+    if: github.event.ref_type == 'branch'
     name: delete namespace and resources
     runs-on: ubuntu-latest
 
