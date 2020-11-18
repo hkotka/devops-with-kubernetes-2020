@@ -46,6 +46,7 @@ jobs:
           sudo install -m 755 kubeseal /usr/local/bin/kubeseal
           echo ${{ secrets.POSTGRESPW }} >> mysecret-project.json
           kubeseal --scope cluster-wide -o yaml <mysecret-project.json >postgres-project-secrets.yaml
+          kubectl apply -f ssd-storage-class.yaml
           kubectl apply -k .
 
   build-and-publish-images:
