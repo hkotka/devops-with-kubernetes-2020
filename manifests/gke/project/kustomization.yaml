@@ -4,5 +4,4 @@ kind: Kustomization
 resources:
   - postgres-project-secrets.yaml
   - ingress.yaml
-  - namespace.yaml
   - postgres.yaml
