@@ -65,6 +65,7 @@ func (t *Todo) String() string {
 }
 
 func main() {
+	log.SetOutput(os.Stdout)
 	todoList.Init()
 
 	go func() {
