@@ -61,7 +61,7 @@ func (t *Todos) Init() {
 }
 
 func (t *Todo) String() string {
-	return fmt.Sprintf("Added new todo wit ID: %d and task: %s", t.ID, t.Name)
+	return fmt.Sprintf("Added new todo with ID: %d and task: %s", t.ID, t.Name)
 }
 
 func main() {
