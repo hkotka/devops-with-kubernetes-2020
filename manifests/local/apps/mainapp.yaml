@@ -98,3 +98,15 @@ spec:
               value: "postgres-admin"
             - name: POSTGRES_DB
               value: "pingpong"
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            httpGet:
+              path: /
+              port: 8080
+            livenessProbe:
+              initialDelaySeconds: 10
+              periodSeconds: 5
+              httpGet:
+                path: /
+                port: 8080
