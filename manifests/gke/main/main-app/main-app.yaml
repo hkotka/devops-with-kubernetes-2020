@@ -63,6 +63,18 @@ spec:
             limits:
               memory: "50Mi"
               cpu: "400m"
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            httpGet:
+              path: /healthz
+              port: 8080
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+              path: /healthz
+              port: 8080
         - name: timestamper
           image: hkotka/main-app2
           imagePullPolicy: Always
