@@ -3,7 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -25,13 +28,24 @@ type pong struct {
 // Serves timestamp from a file and adds hash
 func main() {
 	fmt.Println("Server started in port", httpServePort)
-	http.HandleFunc("/", defaultHandler)
-	if err := http.ListenAndServe(":"+httpServePort, nil); err != nil {
-		fmt.Println(err)
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"*"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	r.GET("/healthz", ginHandlerGKEHealthcheck)
+	r.GET("/", ginDefaultHandler)
+	if err := r.Run(); err != nil {
+		log.Fatal(err)
 	}
 }
 
-func defaultHandler(w http.ResponseWriter, _ *http.Request) {
+func ginDefaultHandler(c *gin.Context) {
 	msg := os.Getenv("MESSAGE")
 	timestamp, err := readFromFile(timestampFile)
 	if err != nil {
@@ -41,9 +55,18 @@ func defaultHandler(w http.ResponseWriter, _ *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	resp := msg + "\n" + timestamp + rndString() + "\n" + strconv.Itoa(pongCount)
-	if _, err := fmt.Fprintf(w, resp); err != nil {
-		fmt.Println(err)
+	c.String(200, "%s", msg+"\n"+timestamp+rndString()+"\n"+strconv.Itoa(pongCount))
+}
+
+func ginHandlerGKEHealthcheck(c *gin.Context) {
+	if _, err := getPongCount(pongUrl); err != nil {
+		c.JSON(500, gin.H{
+			"health": err,
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"health": "ok",
+		})
 	}
 }
 
