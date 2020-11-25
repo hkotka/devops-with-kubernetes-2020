@@ -87,7 +87,6 @@ func main() {
 	r := gin.New()
 	r.Use(logger.SetLogger())
 
-	// Custom logger
 	subLog := zerolog.New(os.Stdout).With().
 		Logger()
 
@@ -105,6 +104,7 @@ func main() {
 	}))
 
 	r.GET("/", ginHandlerGKEHealthcheck)
+	r.GET("/healthz", ginHandlerHealthcheck)
 	r.Use(static.Serve("/images", static.LocalFile("/images", false)))
 	r.GET("/todos", ginHandlerGetTodos)
 	r.POST("/todos", ginHandlerPostTodo)
@@ -114,9 +114,22 @@ func main() {
 	}
 }
 
+func ginHandlerHealthcheck(c *gin.Context) {
+	err := todoList.db.Exec("SELECT 1").Error
+	if err != nil {
+		c.JSON(500, gin.H{
+			"health": "NOK",
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"health": "OK",
+		})
+	}
+}
+
 func ginHandlerGKEHealthcheck(c *gin.Context) {
 	c.JSON(200, gin.H{
-		"health": "ok",
+		"health": "OK",
 	})
 }
 
